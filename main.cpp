@@ -106,6 +106,10 @@ int main()
 		0, 1, 2
 	};
 
+	unsigned int VAO{};
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
 	unsigned int VBO{};
 	// mengenerate sebuah ID untuk [VBO]
 	glGenBuffers(1, &VBO);
@@ -113,10 +117,6 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	// menaruh data ke dalam gl_array_buffer
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verticles), verticles, GL_STATIC_DRAW);
-
-	unsigned int VAO{};
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
 
 	unsigned int EBO{};
 	glGenBuffers(1, &EBO);
