@@ -97,6 +97,9 @@ int main()
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 	ourShader.deleteProgram();
 
 	// mematikan program
