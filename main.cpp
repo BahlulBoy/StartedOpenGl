@@ -49,10 +49,11 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(false);
 	unsigned char* data = stbi_load("C:/Users/HP/Downloads/wood.jpg", &width, &height, &nrChannels, 0);
 	if (data) 
 	{
@@ -64,13 +65,32 @@ int main()
 		std::cout << "failed to load image" << std::endl;
 	}
 	stbi_image_free(data);
-	
+
+	unsigned int texture2;
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	data = stbi_load("C:/Users/HP/Downloads/awesomeface.png", &width, &height, &nrChannels, 0);
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		std::cout << "cant load second image" << std::endl;
+	}
+	stbi_image_free(data);
 
 	float verticles[] = {
-		-0.5f,  0.5f,  0.0f,   0.0f,  0.0f,  0.0f,   0.0f,  1.0f,
-		-0.5f, -0.5f,  0.0f,   0.0f,  0.0f,  0.0f,   0.0f,  0.0f,
-		 0.5f, -0.5f,  0.0f,   0.0f,  0.0f,  0.0f,   1.0f,  0.0f,
-		 0.5f,  0.5f,  0.0f,   0.0f,  0.0f,  0.0f,   1.0f,  1.0f,
+		-0.5f,  0.5f,  0.0f,   1.0f,  0.5f,  0.0f,   0.0f,  1.0f,
+		-0.5f, -0.5f,  0.0f,   0.0f,  1.0f,  0.5f,   0.0f,  0.0f,
+		 0.5f, -0.5f,  0.0f,   0.5f,  0.0f,  1.0f,   1.0f,  0.0f,
+		 0.5f,  0.5f,  0.0f,   0.5f,  1.0f,  0.0f,   1.0f,  1.0f,
 	};
 
 	std::vector<unsigned int> indicades = {
@@ -105,6 +125,11 @@ int main()
 
 	//int vertexOurColorLoc = glGetUniformLocation(ourShader.ID, "ourColor");
 	//glUniform4f(vertexOurColorLoc, 1.0f, 1.0f, 0.0f, 0.0f);
+	
+	ourShader.use();
+
+	glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
+	glUniform1i(glGetUniformLocation(ourShader.ID, "texture2"), 1);
 
 	// program ketika berjalan
 	while (!glfwWindowShouldClose(window))
@@ -114,11 +139,15 @@ int main()
 		glClearColor(0.8f, 0.8f, 0.8f, 0.8f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		ourShader.use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture2);
 
 		//glUniform4f(vertexOurColorLoc, 0.5f, 0.1f, 0.1f, 1.0f);
 
-		glBindTexture(GL_TEXTURE_2D, texture);
+		ourShader.use();
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, indicades.size(), GL_UNSIGNED_INT, 0);
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
